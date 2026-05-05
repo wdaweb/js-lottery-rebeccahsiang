@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RGB 隨機顏色選擇器</title>
+    <style>
+      /* 全局樣式 */
+      body {
+        font-family: "標楷體", "monospace";
+        display: flex;
+        /* 將這個方向轉 90 度 ，橫向改垂直*/
+        flex-direction: column;
+        /* 水平置中 */
+        align-items: center;
+        /* 垂直置中 */
+        justify-content: center;
+        /* 填滿整個視窗 */
+        height: 100vh;
+      }
+
+      /* 標題 */
+      h1 {
+        font-size: 32px;
+        margin-bottom: 20px;
+        text-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
+        color: rgb(100, 150, 200);
+      }
+
+      /* 顏色方塊 */
+      #color-display {
+        width: 300px;
+        height: 300px;
+        border: 10px solid #333;
+        border-radius: 10px;
+        box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.5);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+      }
+
+      /* 滑桿控制區塊 */
+      .control {
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        width: 500px;
+      }
+
+      /* 滑桿標籤 */
+      label {
+        width: 30px;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      /* 滑桿 */
+      input {
+        flex: 1;
+        cursor: pointer;
+        margin: 0 15px;
+      }
+
+      /* 滑桿數據回饋區塊 */
+      .value-text {
+        width: 40px;
+        text-align: right;
+        font-family: monospace;
+        font-size: 18px;
+        font-weight: bold;
+        margin-right: 15px;
+      }
+
+      /* 小型的隨機按鈕 */
+      .btn-sm {
+        padding: 5px 10px;
+        font-size: 12px;
+        /* 手指頭 */
+        cursor: pointer;
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      /* 滑過變色 */
+      .btn-sm:hover {
+        background-color: #ddd;
+      }
+
+      /* 三色一起隨機按鈕 */
+      #random-btn {
+        margin-top: 30px;
+        padding: 12px 40px;
+        font-size: 18px;
+        cursor: pointer;
+        background-color: #333;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      /* 滑過變色交加效果 */
+      #random-btn:hover {
+        background-color: #000;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>RGB 隨機顏色選擇器</h1>
+    <div id="color-display"></div>
+
+    <!-- R 滑桿與隨機按鈕 -->
+    <div class="control">
+      <label style="color: #ff0000">R色</label>
+      <input type="range" id="r-slider" min="0" max="255" value="100" />
+      <span class="value-text" id="r-val">100</span>
+      <button class="btn-sm" id="r-random">點我隨機</button>
+    </div>
+
+    <!-- G 滑桿與隨機按鈕 -->
+    <div class="control">
+      <!-- 標籤，提示文字（這是什麼？） -->
+      <label style="color: #00ff00">G色</label>
+      <!-- 操作工具（拉拉看） -->
+      <input type="range" id="g-slider" min="0" max="255" value="150" />
+      <!-- 數據回饋（現在是多少？） -->
+      <span class="value-text" id="g-val">150</span>
+      <!-- 隨機按鈕 -->
+      <button class="btn-sm" id="g-random">點我隨機</button>
+    </div>
+
+    <!-- B 滑桿與隨機按鈕 -->
+    <div class="control">
+      <label style="color: #0000ff">B色</label>
+      <input type="range" id="b-slider" min="0" max="255" value="200" />
+      <span class="value-text" id="b-val">200</span>
+      <button class="btn-sm" id="b-random">點我隨機</button>
+    </div>
+
+    <!-- 三色一起隨機按鈕 -->
+    <button id="random-btn">三色一起隨機</button>
+
+    <script>
+      //  1. 選取元素 (Selecting Elements)在 JS 操作 HTML 之前先找到他們。
+      const rSlider = document.getElementById("r-slider");
+      const gSlider = document.getElementById("g-slider");
+      const bSlider = document.getElementById("b-slider");
+
+      const rText = document.getElementById("r-val");
+      const gText = document.getElementById("g-val");
+      const bText = document.getElementById("b-val");
+      const colorDisplay = document.getElementById("color-display");
+
+      const rRandomBtn = document.getElementById("r-random");
+      const gRandomBtn = document.getElementById("g-random");
+      const bRandomBtn = document.getElementById("b-random");
+      const randomBtn = document.getElementById("random-btn");
+
+      //  2. 資料處理與更新 (Function)讀取數值並改變顏色
+      const updateColor = () => {
+        const r = rSlider.value; // 讀取滑桿目前的數值 (0-255)
+        const g = gSlider.value;
+        const b = bSlider.value;
+
+        rText.innerHTML = r; // 將讀到的數字寫進 <span> 標籤裡顯示
+        gText.innerHTML = g;
+        bText.innerHTML = b;
+
+        const rgbString = `rgb(${r}, ${g}, ${b})`; // 拼接 CSS 字串
+        colorDisplay.style.backgroundColor = rgbString; // .style.backgroundColor 透過 JS 直接修改 CSS 顏色塊的背景顏色
+        colorDisplay.innerHTML = rgbString; // 改變顏色方塊內部的 HTML 文字內容
+      };
+
+      // 3. 亂數產生隨機數 (0-255)
+      // 0 到 0.99 之間的隨機小數*256，放大範圍到 0 到 255.99，無條件捨去小數點，得到的是 0 到 255
+      const getRandomValue = () => Math.floor(Math.random() * 256);
+
+      //  4. 事件監聽
+
+      //  A. 即時監聽滑桿，input觸發，觸發後要執行的函式名稱
+      rSlider.addEventListener("input", updateColor);
+      gSlider.addEventListener("input", updateColor);
+      bSlider.addEventListener("input", updateColor);
+
+      //  B. 監聽點擊按鈕
+      rRandomBtn.onclick = () => {
+        rSlider.value = getRandomValue();
+        updateColor();
+      };
+
+      gRandomBtn.onclick = () => {
+        gSlider.value = getRandomValue(); // 1. 先把滑桿值變隨機
+        updateColor(); // 2. 重新計算顏色並更新畫面
+      };
+
+      bRandomBtn.onclick = () => {
+        bSlider.value = getRandomValue();
+        updateColor();
+      };
+
+      // 三色一起隨機按鈕點擊事件
+      randomBtn.onclick = () => {
+        rSlider.value = getRandomValue();
+        gSlider.value = getRandomValue();
+        bSlider.value = getRandomValue();
+        updateColor();
+      };
+
+      // 頁面載入初始化
+      updateColor();
+    </script>
+  </body>
+</html>
